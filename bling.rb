@@ -1,4 +1,4 @@
-TIDESPRAY_LINEN = 1000
+TIDESPRAY_LINEN = 75*200
 
 TIDESPRAY_TOTAL = 472.0
 TIDESPRAY_BLUE_PROCS = 72.0
@@ -57,20 +57,7 @@ def scrap_greens(num_greens)
   }
 end
 
-def price_of(item)
-  items = {
-    tidespray_linen: 50000,
-    nylon_thread: 6000,
-    veiled_crystal: 5550000,
-    calcified_bone: 14499,
-    tempest_hide: 31666,
-    mistscale: 129690,
-    gloom_dust: 157499,
-    umbra_shard: 3454999
-  }
 
-  items[item]
-end
 
 def wowify(amount)
   gold = amount / 10000
@@ -131,10 +118,16 @@ def tidespray_linen_to_enchanting_mats
   puts "B"
   puts enchanting_mats
 
+  mats = {
+    gloom_dust: enchanting_mats[:gloom_dust] + epic_de[:gloom_dust],
+    umbra_shard: enchanting_mats[:umbra_shard] + epic_de[:umbra_shard],
+    veiled_crystals: enchanting_mats[:veiled_crystals] + epic_de[:veiled_crystals]
+  }
+
   sales = {
-    gloom_dust: enchanting_mats[:gloom_dust] * price_of(:gloom_dust),
-    umbra_shard: enchanting_mats[:umbra_shard] * price_of(:umbra_shard),
-    veiled_crystal: enchanting_mats[:veiled_crystals] * price_of(:veiled_crystal),
+    gloom_dust: mats[:gloom_dust] * price_of(:gloom_dust),
+    umbra_shard: mats[:umbra_shard] * price_of(:umbra_shard),
+    veiled_crystal: mats[:veiled_crystals] * price_of(:veiled_crystal),
     tidespray_linen: scrap[:tidespray_linen] * price_of(:tidespray_linen),
   }
 
@@ -150,6 +143,27 @@ def tidespray_linen_to_enchanting_mats
   puts "-" * 25
 
   puts wowify(total_sales)
+
+  puts ""
+
+  puts "Profit: #{wowify(total_sales - cost)}"
+
+  return total_sales - cost
+end
+
+def price_of(item)
+  items = {
+    tidespray_linen: 50000,
+    nylon_thread: 6000,
+    veiled_crystal: 7500000,
+    calcified_bone: 75000,
+    tempest_hide: 39300,
+    mistscale: 39300,
+    gloom_dust: 84000,
+    umbra_shard: 3002500
+  }
+
+  items[item]
 end
 
 def tidespray_linen_disenchant_all
@@ -180,6 +194,12 @@ def tidespray_linen_disenchant_all
     veiled_crystal: enchanting_mats[:veiled_crystals] * price_of(:veiled_crystal)
   }
 
+  puts "Investment cost: #{wowify(cost)}"
+  puts "Tidespray: #{wowify(price_of(:tidespray_linen))}"
+
+
+  puts ""
+
   total_sales = 0
   sales.keys.each do |k|
     sale = sales[k]
@@ -192,11 +212,27 @@ def tidespray_linen_disenchant_all
   puts "-" * 25
 
   puts wowify(total_sales)
+
+  puts ""
+
+  puts "Profit: #{wowify(total_sales - cost)}"
+
+  return total_sales - cost
 end
 
 puts "Hello. I am Blingtron."
 puts ""
 
-tidespray_linen_to_enchanting_mats
+ shuffle = tidespray_linen_to_enchanting_mats
 
-tidespray_linen_disenchant_all
+ de = tidespray_linen_disenchant_all
+
+ puts ""
+ puts ""
+ puts ""
+ puts ""
+ puts ""
+ puts ""
+
+ puts "Shuffle: #{wowify(shuffle)}"
+ puts "Disench: #{wowify(de)}"
