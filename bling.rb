@@ -1,4 +1,8 @@
-TIDESPRAY_LINEN = 75*200
+require 'rbattlenet'
+
+INVENTORY_TIDESPRAY_LINEN = 1378
+BUYING_TIDESPRAY_LINEN = 0
+TIDESPRAY_LINEN = INVENTORY_TIDESPRAY_LINEN + BUYING_TIDESPRAY_LINEN
 
 TIDESPRAY_TOTAL = 472.0
 TIDESPRAY_BLUE_PROCS = 72.0
@@ -68,6 +72,85 @@ def wowify(amount)
   copper = amount % 100
 
   "#{gold}g #{silver}s #{copper}c"
+end
+
+def shimmer_scale_to_enchanting_mats
+  # The cost of the linen plus the nylon thread
+  num_crafted = 200
+
+  materials_used = {
+    blood_stained_bone: 4,
+    shimmerscale: 6
+  }
+
+  cost = 0
+  cost += (materials_used[:blood_stained_bone] * price_of(:blood_stained_bone))
+  cost += (materials_used[:shimmerscale] * price_of(:shimmerscale))
+  cost *= num_crafted
+
+  # first, craft the bracers
+  bracers = craft_bracers
+
+  # disenchant the blues
+  enchanting_mats = disenchant_blues(bracers[:blue])
+
+  # scrap the greens
+  scrap = scrap_greens(bracers[:green])
+
+  # craft 310 epic leather bracers, we'll just assume we're always going to craft
+  # as many as we have expulsom since that is typically the limiting factor
+  leather_bracers_crafted = scrap[:expulsom]
+
+
+  leather_bracer_cost = (price_of(:calcified_bone) * 8) + (price_of(:tempest_hide) * 12)
+
+  materials_used[:calcified_bone] = leather_bracers_crafted * 8
+  materials_used[:tempest_hide] = leather_bracers_crafted * 12
+
+  total_epic_bracer_cost = leather_bracer_cost * leather_bracers_crafted
+
+  cost += total_epic_bracer_cost
+
+  puts "Raw Material Costs: #{wowify(cost)}"
+
+  # disenchant the epics
+  epic_de = disenchant_epics(leather_bracers_crafted)
+  puts "Q"
+  puts epic_de
+  puts "B"
+  puts enchanting_mats
+
+  mats = {
+    gloom_dust: enchanting_mats[:gloom_dust] + epic_de[:gloom_dust],
+    umbra_shard: enchanting_mats[:umbra_shard] + epic_de[:umbra_shard],
+    veiled_crystals: enchanting_mats[:veiled_crystals] + epic_de[:veiled_crystals]
+  }
+
+  sales = {
+    gloom_dust: mats[:gloom_dust] * price_of(:gloom_dust),
+    umbra_shard: mats[:umbra_shard] * price_of(:umbra_shard),
+    veiled_crystal: mats[:veiled_crystals] * price_of(:veiled_crystal),
+    tidespray_linen: scrap[:tidespray_linen] * price_of(:tidespray_linen),
+  }
+
+  total_sales = 0
+  sales.keys.each do |k|
+    sale = sales[k]
+
+    puts "#{k}: #{wowify(sale)}"
+
+    total_sales += sale
+  end
+
+  puts "-" * 25
+
+  puts wowify(total_sales)
+
+  puts ""
+
+  puts "Profit: #{wowify(total_sales - cost)}"
+
+  return total_sales - cost
 end
 
 def tidespray_linen_to_enchanting_mats
@@ -153,14 +236,16 @@ end
 
 def price_of(item)
   items = {
-    tidespray_linen: 50000,
+    tidespray_linen: 75000,
     nylon_thread: 6000,
-    veiled_crystal: 7500000,
-    calcified_bone: 75000,
-    tempest_hide: 39300,
-    mistscale: 39300,
-    gloom_dust: 84000,
-    umbra_shard: 3002500
+    veiled_crystal: 4450000,
+    calcified_bone: 23000,
+    tempest_hide: 40000,
+    mistscale: 125000,
+    gloom_dust: 135500,
+    umbra_shard: 1919999,
+    blood_stained_bone: 22700,
+    shimmerscale: 74000
   }
 
   items[item]
@@ -225,6 +310,8 @@ puts ""
 
  shuffle = tidespray_linen_to_enchanting_mats
 
+ mail_shuffle = shimmer_scale_to_enchanting_mats
+
  de = tidespray_linen_disenchant_all
 
  puts ""
@@ -236,3 +323,4 @@ puts ""
 
  puts "Shuffle: #{wowify(shuffle)}"
  puts "Disench: #{wowify(de)}"
+ puts "Mail   : #{wowify(mail_shuffle)}"
