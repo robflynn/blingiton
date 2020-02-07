@@ -2,10 +2,7 @@
   <div id="app">
     <h2>Blingy</h2>
 
-    <button id="start">Go</button>
-
-    <div class="console">
-    </div>
+    <button id="start" @click="go">Go</button>
   </div>
 </template>
 
@@ -14,23 +11,19 @@
 import Vue from 'vue';
 import Simulation, { ClothToEnchantingMatsShuffleSimulation } from "./simulation";
 
-function go() {
-  // loop through simulations
-  // for each simulation
-  let simulation = new ClothToEnchantingMatsShuffleSimulation()
-  simulation.run()
-  // end for each
-}
-
 export default Vue.extend({
   name: 'app',
   components: {
   },
-  mounted: () => {
-    document.querySelector("#start").addEventListener("click", () => {
-      go();
-    })
-  },
+  methods: {
+    go: () => {
+      // loop through simulations
+      // for each simulation
+      let simulation = new ClothToEnchantingMatsShuffleSimulation()
+      simulation.run()
+      // end for each
+    }
+  }
 });
 </script>
 
@@ -55,17 +48,5 @@ html,body {
   border: solid 2px $color;
   padding: 20px;
   margin: 20px;
-}
-
-.console {
-  margin-top: 2em;
-  background: rgba(0, 0, 0, 0.7);
-  padding: 10px;
-  color: #f0f0f0;
-  font-family: monospace;
-  font-size: 1.5em;
-  letter-spacing: 0.1em;
-  height: 600px;
-  overflow: auto;
 }
 </style>
